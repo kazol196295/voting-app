@@ -266,25 +266,3 @@ export default function VotingDApp() {
   );
 }
 
-
-
-    Directory: D:\blockchain\voting app\frontend
-
-
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
-d-----         15-Jul-25  12:53 PM                .next
-d-----         15-Jul-25  12:23 PM                node_modules
-d-----         15-Jul-25  12:22 PM                public
-d-----         15-Jul-25  12:22 PM                src
-
-
-
-
-
-    Directory: D:\blockchain\voting app\frontend\src
-
-
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
-d-----         15-Jul-25  12:22 PM                app
