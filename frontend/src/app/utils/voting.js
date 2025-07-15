@@ -1,7 +1,8 @@
 import { ethers } from "ethers";
 // go up utils → app → src  (= 3 levels) then into artifacts
-import Voting from "../../../../artifacts/contracts/Voting.sol/Voting.json";
-
+//import Voting from "../../../../artifacts/contracts/Voting.sol/Voting.json";
+//for vercel
+import Voting from "../utils/Voting.json";
 export const getVotingContract = async () => {
     //metamask
     //getting the contrct 
