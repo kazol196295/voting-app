@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { getVotingContract } from './utils/voting';
 
 export default function VotingDApp() {
-   const [elections, setElections] = useState([]);
-   const [currentTime, setCurrentTime] = useState(null);
+  const [elections, setElections] = useState([]);
+  const [currentTime, setCurrentTime] = useState(null);
   const [account, setAccount] = useState(null);
   const [electionName, setElectionName] = useState('');
   const [duration, setDuration] = useState('');
@@ -113,7 +113,7 @@ export default function VotingDApp() {
     }
   };
 
-    const fetchAllElections = async () => {
+  const fetchAllElections = async () => {
     try {
       const { contract } = await getVotingContract();
       // getAllElections returns: [ids, names, currentTime, endtimes, actives]
@@ -132,6 +132,19 @@ export default function VotingDApp() {
     }
   };
 
+  const deleteElection = async (eid) => {
+    try {
+      const { contract } = await getVotingContract();
+      const tx = await contract.deleteElection(parseInt(eid));
+      await tx.wait();
+      alert('Election deleted!');
+      fetchAllElections();
+    } catch (error) {
+      console.error(error);
+      alert('Error deleting election: ' + error.message);
+    }
+  };
+
 
 
   return (
@@ -147,7 +160,7 @@ export default function VotingDApp() {
       ) : (
         <div>
           <p>Connected: {account}</p>
-          
+
           <h2>Create Election</h2>
           <input
             type="text"
@@ -299,6 +312,7 @@ export default function VotingDApp() {
                   <th style={{ border: '1px solid #ccc', padding: '6px' }}>Name</th>
                   <th style={{ border: '1px solid #ccc', padding: '6px' }}>End Time</th>
                   <th style={{ border: '1px solid #ccc', padding: '6px' }}>Active</th>
+                  <th style={{ border: '1px solid #ccc', padding: '6px' }}>Delete</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,9 +320,17 @@ export default function VotingDApp() {
                   <tr key={e.id}>
                     <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.id}</td>
                     <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.name}</td>
-
                     <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.endtime}</td>
                     <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.active ? 'Yes' : 'No'}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '6px' }}>
+                      <button
+                        onClick={() => deleteElection(e.id)}
+                        style={{ background: '#e00', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 10px' }}
+                        disabled={e.active}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

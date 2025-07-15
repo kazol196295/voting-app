@@ -136,24 +136,50 @@ contract Voting {
     }
 
     function getAllElections()
-    public
-    view
-    returns (uint[] memory, string[] memory,uint , uint[] memory, bool[] memory)
-{
-    uint[] memory ids = new uint[](electionCount);
-    string[] memory names = new string[](electionCount);
-    uint[] memory endtimes = new uint[](electionCount);
-    bool[] memory actives = new bool[](electionCount);
-    uint currentTime;
+        public
+        view
+        returns (
+            uint[] memory,
+            string[] memory,
+            uint,
+            uint[] memory,
+            bool[] memory
+        )
+    {
+        uint[] memory ids = new uint[](electionCount);
+        string[] memory names = new string[](electionCount);
+        uint[] memory endtimes = new uint[](electionCount);
+        bool[] memory actives = new bool[](electionCount);
+        uint currentTime;
 
-    for (uint i = 0; i < electionCount; i++) {
-        Election storage e = elections[i + 1];
-        ids[i] = e.id;
-        names[i] = e.name;
-        endtimes[i] = e.endtime;
-        actives[i] = e.isActive;
-        currentTime = block.timestamp;
+        for (uint i = 0; i < electionCount; i++) {
+            Election storage e = elections[i + 1];
+            ids[i] = e.id;
+            names[i] = e.name;
+            endtimes[i] = e.endtime;
+            actives[i] = e.isActive;
+            currentTime = block.timestamp;
+        }
+        return (ids, names, currentTime, endtimes, actives);
     }
-    return (ids, names,currentTime, endtimes, actives);
-}
+
+    function deleteElection(uint eid) public onlyAdmin electionExists(eid) {
+        require(
+            elections[eid].isActive == false,
+            "End election before deleting"
+        );
+        // Shift all elections after eid one position up
+        for (uint i = eid; i < electionCount; i++) {
+            // Manually copy non-mapping fields
+            elections[i].id = elections[i + 1].id;
+            elections[i].name = elections[i + 1].name;
+            elections[i].isActive = elections[i + 1].isActive;
+            elections[i].endtime = elections[i + 1].endtime;
+            elections[i].candCount = elections[i + 1].candCount;
+            elections[i].totalVotes = elections[i + 1].totalVotes;
+            elections[i].id = i;
+        }
+        delete elections[electionCount];
+        electionCount--;
+    }
 }
