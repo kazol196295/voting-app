@@ -134,4 +134,26 @@ contract Voting {
 
         return (winnerId, elections[eid].candidates[winnerId].name, mxvote);
     }
+
+    function getAllElections()
+    public
+    view
+    returns (uint[] memory, string[] memory,uint , uint[] memory, bool[] memory)
+{
+    uint[] memory ids = new uint[](electionCount);
+    string[] memory names = new string[](electionCount);
+    uint[] memory endtimes = new uint[](electionCount);
+    bool[] memory actives = new bool[](electionCount);
+    uint currentTime;
+
+    for (uint i = 0; i < electionCount; i++) {
+        Election storage e = elections[i + 1];
+        ids[i] = e.id;
+        names[i] = e.name;
+        endtimes[i] = e.endtime;
+        actives[i] = e.isActive;
+        currentTime = block.timestamp;
+    }
+    return (ids, names,currentTime, endtimes, actives);
+}
 }

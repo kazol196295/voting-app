@@ -9,7 +9,7 @@ export const getVotingContract = async () => {
     if (typeof window.ethereum !== 'undefined') {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const contractAddress = "0x749c0efAb16278951859A78E9B3edCD90Dfb77CC";
+    const contractAddress = "0xC250BBe141bc4FC1Eb6705419F8ddD5d0483028D";
     const abi = Voting.abi;
     const signer = await provider.getSigner();
     const contract = new ethers.Contract(contractAddress, abi, signer);

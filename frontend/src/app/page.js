@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { getVotingContract } from './utils/voting';
 
 export default function VotingDApp() {
+   const [elections, setElections] = useState([]);
+   const [currentTime, setCurrentTime] = useState(null);
   const [account, setAccount] = useState(null);
   const [electionName, setElectionName] = useState('');
   const [duration, setDuration] = useState('');
@@ -111,13 +113,26 @@ export default function VotingDApp() {
     }
   };
 
-  // Handle MetaMask network/account changes
-  // useEffect(() => {
-  //   if (window.ethereum) {
-  //     window.ethereum.on('chainChanged', () => window.location.reload());
-  //     window.ethereum.on('accountsChanged', () => window.location.reload());
-  //   }
-  // }, []);
+    const fetchAllElections = async () => {
+    try {
+      const { contract } = await getVotingContract();
+      // getAllElections returns: [ids, names, currentTime, endtimes, actives]
+      const [ids, names, currentTimeOnChain, endtimes, actives] = await contract.getAllElections();
+      setCurrentTime(currentTimeOnChain.toString());
+      const electionsArr = ids.map((id, idx) => ({
+        id: id.toString(),
+        name: names[idx],
+        endtime: endtimes[idx].toString(),
+        active: actives[idx],
+      }));
+      setElections(electionsArr);
+    } catch (error) {
+      console.error(error);
+      alert('Error fetching elections: ' + error.message);
+    }
+  };
+
+
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
@@ -261,6 +276,45 @@ export default function VotingDApp() {
             </p>
           )}
         </div>
+      )}
+      {currentTime && (
+        <div style={{ marginBottom: '10px', color: '#555' }}>
+          <strong>Current Blockchain Time:</strong> {currentTime}
+        </div>
+      )}
+
+      {account && (
+        <>
+          <button
+            onClick={fetchAllElections}
+            style={{ margin: '10px 0', padding: '8px 16px', background: '#222', color: '#fff', border: 'none', borderRadius: '5px' }}
+          >
+            Show All Elections
+          </button>
+          {elections.length > 0 && (
+            <table style={{ width: '100%', marginTop: '10px', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ border: '1px solid #ccc', padding: '6px' }}>ID</th>
+                  <th style={{ border: '1px solid #ccc', padding: '6px' }}>Name</th>
+                  <th style={{ border: '1px solid #ccc', padding: '6px' }}>End Time</th>
+                  <th style={{ border: '1px solid #ccc', padding: '6px' }}>Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                {elections.map(e => (
+                  <tr key={e.id}>
+                    <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.id}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.name}</td>
+
+                    <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.endtime}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '6px' }}>{e.active ? 'Yes' : 'No'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
       )}
     </div>
   );
